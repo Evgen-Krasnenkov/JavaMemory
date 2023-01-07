@@ -1,20 +1,20 @@
 package SoftLeaks;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class CustomerManager {
 
-	private List<Customer> customers = new ArrayList<Customer>();
-	private int nextId = 0;
+	private List<Customer> customers = Collections.synchronizedList(new ArrayList<Customer>());
+	private AtomicInteger nextId = new AtomicInteger(0);
 
 	public  void addCustomer(Customer customer) {
-		synchronized (this) {
 			customer.setId(nextId);
-			nextId++;
-		}
+			nextId.incrementAndGet();
 		customers.add(customer);
 	}
 	
@@ -22,18 +22,19 @@ public class CustomerManager {
 		//should do:
 		//customers.remove(0);
 		Customer result = null;
-		synchronized (this) {
 			if (customers.size() > 0) {
-				result = customers.remove(0);
+				result = customers.get(0);
 			}
-		}
 		return result;
 	}
 
 	public void howManyCustomers() {
 		int size = 0;
 		size = customers.size();
-		System.out.println("" + new Date() + " : " + size);
+		System.out.println("# Customers in the list: " + new Date() + " : " + size);
+	}
+	public void howManyCustomersGenerated(){
+		System.out.println("# Customers Generated: " + new Date() + " : " + this.nextId);
 	}
 
 	public void displayCustomers() {
